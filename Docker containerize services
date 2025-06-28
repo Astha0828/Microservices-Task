@@ -1,0 +1,60 @@
+Task 1 #Creating Docker files 
+# Use Node.js base image
+FROM node:18
+# Set working directory
+WORKDIR /app
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+# Copy the rest of the code
+COPY . .
+# Expose the port (change per service)
+EXPOSE 3000
+# Start the service
+CMD ["npm", "start"]
+project-root/
+│
+├── user-service/
+│   └── Dockerfile
+│   └── package.json
+│   └── index.js
+│
+├── product-service/
+│   └── Dockerfile
+│   └── package.json
+│   └── index.js
+│
+├── gateway-service/
+│   └── Dockerfile
+│   └── package.json
+│   └── index.js
+│
+└── docker-compose.yml
+⚙️ Step 3: Create docker-compose.yml
+version: '3.8'
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+  product-service:
+    build: ./product-service
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+  gateway-service:
+    build: ./gateway-service
+    ports:
+      - "3003:3003"
+    depends_on:
+      - user-service
+      - product-service
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+docker-compose up --build
